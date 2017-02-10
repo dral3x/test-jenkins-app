@@ -12,6 +12,7 @@ properties([
 	])
 ])
 
+node {
 stage("Checkout") {
 	def credentialsId = 'dec9dfc6-75b8-45bb-8463-a1b6031f4a03'
 	def defaultBranch = 'master'
@@ -39,4 +40,5 @@ stage("Checkout") {
 
 stage("Build") {
 	echo "Done!"
+}
 }
