@@ -4,7 +4,12 @@ properties([
 		displayName: 'Test app', 
 		projectUrlStr: 'https://github.com/dral3x/test-jenkins-app/'
 	], 
-	pipelineTriggers([[$class: 'GitHubPushTrigger']])
+	pipelineTriggers([
+		triggers: [
+			[$class: 'GitHubPushTrigger'],
+			[$class: 'jenkins.triggers.ReverseBuildTrigger', upstreamProjects: "test-lib/${env.BRANCH_NAME}", result: hudson.model.Result.SUCCESS]
+		]
+	])
 ])
 
 stage("Checkout") {
@@ -12,7 +17,13 @@ stage("Checkout") {
 	def defaultBranch = 'master'
 
 	dir('app') {
-	    checkout scm
+	    def repo = 'git@github.com:dral3x/test-jenkins-app.git'
+	    try {
+	        git credentialsId: "${credentialsId}", url: repo, branch: "${env.BRANCH_NAME}"
+	   	}
+ 		catch(exc) {
+	        git credentialsId: "${credentialsId}", url: repo, branch: "${defaultBranch}"
+	    }
 	} 
 
 	dir('lib') {
@@ -27,4 +38,5 @@ stage("Checkout") {
 }
 
 stage("Build") {
+	echo "Done!"
 }
